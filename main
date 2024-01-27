@@ -1,1 +1,1106 @@
-local a;do a={}a.__index=a;function a.new(b,c)return setmetatable({_hits={},_origin=b,_start_pos=b,_sound_id="",_hrp_pos=c,_bullet_hits={},_bullet_hit_gun={aiming=false,equipped="Primary",quick_aimed=false}},a)end;function a:ray_hit(d,e,f,g)table.insert(self._hits,{normal=f,position=e,instance=d,material=g==nil and Enum.Material.Plastic or g})return self end;function a:sound_id(h)self._sound_id="rbxassetid://{id}"return self end;function a:bullet_hit(i,j,k,l,m,n)table.insert(self._bullet_hits,{player=i,humanoid=j,pos=l,part=k,damage=m,killed=n})return self end;function a:serialize()return{self:_serialize_shoot(),self:_serialize_bullet_hole(),self:_serialize_sound(),self:_serialize_bullet_hits()}end;function a:_serialize_hit(o)local p=self._hits[o]return{["Normal"]=p.normal,["Position"]=p.position,["Instance"]=p.instance,["Material"]=p.material}end;function a:_serialize_shoot()local q=table.create(#self._hits)for o=1,#self._hits do q[o]=self:_serialize_hit(o)end;local r=table.create(#self._hits+1)r[1]=self._start_pos;for o=1,#self._hits do r[o+1]=self._hits[o].position end;return{"Shoot",q,{false,false},{false,false},r,{0,0},self._origin,{},{},5}end;function a:_serialize_sound()return{"Sound",{self._origin,self:_serialize_hit(#self._hits)},self._sound_id,1,1}end;function a:_serialize_bullet_hit(o)local p=self._bullet_hits[o]return{["HitPlr"]=p.player,["HitPart"]=p.part,["HitHuman"]=p.humanoid,["DoWhileDead"]=true,["Damage"]=p.damage,["NumberCol"]=0,["DidWallb"]=false,["DidRico"]=false,["Killed"]=false,["ClientHRPPos"]=self._hrp_pos,["PlayerPos"]=self._origin,["StartPos"]=self._start_pos,["HitPos"]=p.pos,["Aiming"]={self._bullet_hit_gun.aiming,false},["Extras"]={}}end;function a:_serialize_bullet_hits()local s=table.create(#self._bullet_hits)for o=1,#self._bullet_hits do s[o]=self:_serialize_bullet_hit(o)end;return{"BulletHit",s,{["Pos"]=self._origin,["QuickAimed"]=self._bullet_hit_gun.quick_aimed,["Equipped"]=self._bullet_hit_gun.equipped,["Aiming"]=self._bullet_hit_gun.aiming}}end;function a:_serialize_bullet_hole()local q=table.create(#self._hits)for o=1,#self._hits do q[o]=self:_serialize_hit(o)end;return{"BulletHole",q,Vector3.zero}end end;local t;do local function u(v)return{v,nil}end;local function w(x,y)if typeof(y)=="table"then table.insert(x,"{}")elseif typeof(y)=="string"then table.insert(x,"\"")table.insert(x,y)table.insert(x,"\"")else table.insert(x,tostring(y))end end;t=function(z)local x={}local A={u(z)}while true do local B=A[#A]while true do local C=B[2]local D,E=next(B[1],C)local F=string.rep("\t",#A-1)if C==nil then table.insert(x,"{\n")end;B[2]=D;if D==nil then x[#x]="\n"..F.."}"if#A>1 then table.remove(A,#A)table.insert(x,",\n")break end;return table.concat(x,"")end;table.insert(x,F.."\t[")w(x,D)table.insert(x,"] = ")if typeof(E)=="table"and next(E)~=nil then table.insert(A,u(E))break end;w(x,E)table.insert(x,",\n")end end end end;local G=game:GetService("Players")local H=game:GetService("ReplicatedStorage")local I=H:WaitForChild("Events"):WaitForChild("Shoot")local J=workspace.CurrentCamera;local K=workspace:WaitForChild("Players")local L=-1.7*10^308;local M=-L;local N=false;local O=nil;local P={}local Q={"1ncrem3ntal","thecopperage","ARaspiberryPi"}local R={}coroutine.wrap(function()while task.wait(5)do local S=G:GetFriendsAsync(G.LocalPlayer.UserId)for T=1,4 do for U,V in pairs(S:GetCurrentPage())do for W,y in pairs(V)do if W=="Username"then table.insert(Q,y)table.insert(R,y)end end end;if T~=4 then local X,Y=pcall(function()S:AdvanceToNextPageAsync()end)if not X then break end end end end end)()local function Z(_)for U,E in pairs(Q)do if E==_.Name then return true end end;return false end;local function a0(_)for U,E in pairs(R)do if E==_.Name then return true end end;return false end;local G=game:GetService("Players")local H=game:GetService("ReplicatedStorage")local a1=H:WaitForChild("Events"):WaitForChild("UseEquipment")local function a2(a3,a4,a5)a1:FireServer("Sticky Bomb","Weld",a5,a3,a4)end;local a6=G.LocalPlayer;local function a7(k)for U,i in G:GetPlayers()do local a8=i.Character;local j=a8 and a8:FindFirstChild("Humanoid")local a9=workspace:FindPartOnRay(Ray.new(k.Position,Vector3.new(0,-1000,0)),a8,false,true)if a9 then a9=a9 else a9=k end;if j~=nil and j.Health>0 and j.Parent~=a6.Character then local aa=a8.PrimaryPart;if aa then a2(a9,aa,Vector3.new(0,3,0))end end end end;local ab={}ab.throw=false;local ac=workspace:WaitForChild("Engine"):WaitForChild("Equipments")ac.ChildAdded:Connect(function(ad)if ab.throw then local ae=game.Players:GetPlayers()[math.random(1,#game.Players:GetPlayers())]print(ae," We can throw this at them!")repeat ae=game.Players:GetPlayers()[math.random(1,#game.Players:GetPlayers())]until ae~=game.Players.LocalPlayer and ae.Character and ae.Character.PrimaryPart;a2(ae.Character.PrimaryPart,ad,Vector3.new(0,0,0))end end)local function af(ag,ah)local table={"Flashbang","Create",ag}a1:FireServer(unpack(table))local ai=nil;repeat for U,E in pairs(workspace.Engine.Equipments:GetChildren())do if E.Name=="Flashbang"and E:GetAttribute("Player")==a6.Name then ai=E end end;task.wait()until ai~=nil;local table={"Flashbang","Explode",ai,{["PlayerPos"]=ag}}task.delay(ah,function()a1:FireServer(unpack(table))end)end;local function aj(ag,ah)local table={"Frag Grenade","Create",ag}a1:FireServer(unpack(table))local ak=nil;repeat for U,E in pairs(workspace.Engine.Equipments:GetChildren())do if E:GetAttribute("Player")==a6.Name then ak=E end end;task.wait()until ak~=nil;local table={"Frag Grenade","Explode",ak,{["PlayerPos"]=ag}}task.delay(ah,function()a1:FireServer(unpack(table))end)end;local function al(ag,ah)local table={"Smoke Grenade","Create",ag}a1:FireServer(unpack(table))local am=nil;repeat for U,E in pairs(workspace.Engine.Equipments:GetChildren())do if E:GetAttribute("Player")==a6.Name then am=E end end;task.wait()until am~=nil;local table={"Smoke Grenade","Explode",am,{["PlayerPos"]=ag}}task.delay(ah,function()a1:FireServer(unpack(table))end)end;local function an(k)local table={"Flashbang","Create",Vector3.new()}a1:FireServer(unpack(table))local table={"Flashbang","Explode",k,{["PlayerPos"]=Vector3.new()}}a1:FireServer(unpack(table))end;local function ao(ap)for U,E in pairs(workspace.Map:GetDescendants())do if E:IsA("BasePart")or E:IsA("Part")then local aq=ap.Character.PrimaryPart;a2(aq,E,Vector3.new(0,0,0))end end end;local function ar(as)for U,E in pairs(G:GetPlayers())do local at=K:FindFirstChild(E.Name)if at and at:FindFirstChild("Humanoid")and at:FindFirstChild("HumanoidRootPart")and(not as or not Z(E))then local au=a.new(Vector3.new(),at.HumanoidRootPart.Position):ray_hit(at.Head,at.Head.Position,Vector3.zero,at.Head.Material):bullet_hit(E,at.Humanoid,at.Head,at.Head.Position,M,true):sound_id(11856245284):serialize()I:FireServer(au)end end end;local function av(_)local at=K:FindFirstChild(_.Name)if at and at:FindFirstChild("Humanoid")and at:FindFirstChild("HumanoidRootPart")then local au=a.new(Vector3.new(),Vector3.new()):ray_hit(at.Head,Vector3.new(),Vector3.zero,at.Head.Material):bullet_hit(_,at.Humanoid,at.Head,at.Head.Position,-3000,true):sound_id(11856245284):serialize()I:FireServer(au)end end;local _=G.LocalPlayer;local aw={}local ax=game:GetService("TextChatService")local ay=ax:WaitForChild("TextChannels")local az=ay.RBXGeneral;local aA=0;local aB={["killall"]={"Yes ma'am, owning the lobby ;3","I'm on it!","I'll get right on it!","Executing order 66","Yes ma'am, killing all players","erm.. little problem boss.. just kidding! Everyone is dead! :3","o-ok >-<","This is Bravo Six, confirming multiple casualties, over.","AIRSTIKE INCOMING!!","RUN FOR YOUR LIVES!","It appears we have multiple dead targets on the field, over.","AC-130 INBOUND!","Chopper gunner standing by."},["rain"]={"TAKE COVER! CLUSTER STRIKE INBOUND!","Copy that, frags inbound.","Frags inbound, get to cover!","Frags inbound, take cover!"}}local function aC(string)for U,E in pairs(G:GetPlayers())do if string.find(E.Name:lower(),string:lower())or string.find(E.DisplayName:lower(),string:lower())then return E end end;return string end;local function aD(aE)local aF=aE;local aG=aF.Text;local aH=aF.TextSource;if aH==_ then return end;if Z(aH)then local aG=aG:lower()aG=aG:gsub(" ","")local aI=aG:split(":")aG=aI[1]table.remove(aI,1)print(aG)print(aI[1])if aG=="killall"then local as=aI[1]if as==nil then as=false else as=as:lower()=="true"end;ar(as)az:SendAsync(aB["killall"][math.random(1,#aB["killall"])])elseif aG=="god"then local aJ=aI[1]if aJ=="clear"then P={}az:SendAsync("Cleared godded players")return end;if aJ=="all"then for U,E in pairs(game:GetService("Players"):GetPlayers())do if not table.find(P,E)and not Z(E)then table.insert(P,E)end end;az:SendAsync("Godded all players")return end;if aJ==nil and not table.find(P,aH)then aH=game:GetService("Players")[aH.Name]table.insert(P,aH)az:SendAsync("Godded "..aH.Name)return end;aJ=aC(aJ)aJ=game:GetService("Players")[aJ.Name]if not aJ then az:SendAsync("Player not found")return end;if table.find(P,aJ)then az:SendAsync("Player is already godded")return end;table.insert(P,aJ)az:SendAsync("Godded "..aJ.Name)elseif aG=="ungod"then for o,E in pairs(P)do if E and E.Character and E.Character.PrimaryPart then table.remove(P,o)local au=a.new(Vector3.new(),E.Character.PrimaryPart.Position):ray_hit(E.Character.Head,E.Character.Head.Position,Vector3.zero,E.Character.Head.Material):bullet_hit(E,E.Character.Humanoid,E.Character.Head,E.Character.Head.Position,M,true):sound_id(11856245284):serialize()I:FireServer(au)az:SendAsync("Ungodded "..E.Name)elseif E and not E.Character then table.remove(P,o)az:SendAsync("Ungodded "..E.Name..", but failed to kill them")end end;P={}elseif aG=="kill"then local aK=aI[1]if aK==nil then az:SendAsync("You must specify a player to kill")return end;aK=aC(aK)if not aK then az:SendAsync("Player not found")return end;if aK.Character and aK.Character:FindFirstChild("Humanoid")and aK.Character:FindFirstChild("HumanoidRootPart")then local aL=a.new(J.CFrame.Position,aK.Character.HumanoidRootPart.Position):ray_hit(aK.Character.Head,aK.Character.Head.Position,Vector3.zero,aK.Character.Head.Material):bullet_hit(aK,aK.Character.Humanoid,aK.Character.Head,aK.Character.Head.Position,M,true):sound_id(11856245284):serialize()I:FireServer(aL)az:SendAsync("Killed "..aK.Name)end elseif aG=="whitelist"then if not a0(aH)then az:SendAsync("You do not have permission to whitelist")return end;local aM=aI[1]if aM==nil then az:SendAsync("You must specify a player to whitelist")return end;aM=aC(aM)if not aM then az:SendAsync("Player not found")return end;for U,E in pairs(Q)do if E==aM.Name then az:SendAsync("Player is already whitelisted")return end end;table.insert(Q,aM.Name)az:SendAsync("Whitelisted "..aM.Name)elseif aG=="unwhitelist"then if not a0(aH)then az:SendAsync("You do not have permission to unwhitelist")return end;local aN=aI[1]if aN==nil then az:SendAsync("You must specify a player to unwhitelist")return end;aN=aC(aN)if not aN then az:SendAsync("Player not found")return end;for o,E in pairs(Q)do if E==aN.Name then table.remove(Q,o)az:SendAsync("Unwhitelisted "..aN.Name)return end end;az:SendAsync("Player is not whitelisted")elseif aG=="tpall"then local aO=game:GetService("Players")[aH.Name]a7(aO.Character.PrimaryPart)az:SendAsync("Teleported all players to you, "..aH.Name)elseif aG=="destroymap"then for U,E in workspace.Map:GetDescendants()do if E:IsA("BasePart")then a1:FireServer("Flashbang","Explode",E,{PlayerPos=Vector3.zero})end end;az:SendAsync("Destroyed the map")elseif aG=="flash"then local aO=game:GetService("Players")[aH.Name]af(aO.Character.PrimaryPart.Position,0.1)az:SendAsync("Sent flashbang")elseif aG=="loopflash"then local aP=aI[1]if aP=="clear"then aw={}az:SendAsync("Cleared looping flashbangs")return end;if aP==nil then az:SendAsync("You must specify a player to loop flashbangs on")return end;if aP=="all"then for U,E in pairs(game:GetService("Players"):GetPlayers())do if not table.find(aw,E)and not Z(E)then table.insert(aw,E)end end;az:SendAsync("Looping flashbangs on all players")return end;aP=aC(aP)aP=game:GetService("Players")[aP.Name]if not table.find(aw,aP)then table.insert(aw,aP)az:SendAsync("Looping flashbangs")else table.remove(aw,table.find(aw,aP))az:SendAsync("Stopped looping flashbangs")end elseif aG=="crash"then for o,E in pairs(H:GetDescendants())do if E:IsA("Part")or E:IsA("BasePart")then an(E)end end elseif aG=="togglethrow"then ab.throw=not ab.throw;az:SendAsync("Toggled throw to "..tostring(ab.throw))elseif aG=="rain"then local ap=game:GetService("Players")[aH.Name]local aQ=400;az:SendAsync(aB["rain"][math.random(1,#aB["rain"])])for o=1,aQ do local aR=Vector3.new(math.random(-200,200),50,math.random(-200,200))local aR=ap.Character.PrimaryPart.Position+aR;aj(aR,math.random(1,7))end elseif aG=="fogofwar"then local ap=game:GetService("Players")[aH.Name]for o,E in pairs(workspace.Players:GetChildren())do local aa=E.PrimaryPart;if aa then al(aa.Position,0.1)end end elseif aG=="spawn"then local ap=game:GetService("Players")[aH.Name]local a8=workspace.Players:FindFirstChild(ap.Name)if a8 and a8.PrimaryPart then local aS=H:WaitForChild("Events"):WaitForChild("Spawn")aS:FireServer(a8.PrimaryPart.Position)az:SendAsync("Spawned at your location")else az:SendAsync("Failed to spawn, please try again")end elseif aG=="hover"then N=not N;local i=game:GetService("Players")[aH.Name]if N then O=i else O=nil end end end end;local aT={}aT.SmokeCooldown=45;aT.BarrageCooldown=45;aT.SnipeCooldown=60;local aU={}local function aV(aE)local aF=aE;local aG=aF.Text;local aH=aF.TextSource;if aH==_ then return end;local aG=aG:lower()aG=aG:gsub(" ","")local aI=aG:split(":")aG=aI[1]table.remove(aI,1)local aW=game:GetService("Players")[aH.Name]if not table.find(aU,aW)then aU[aW]={SmokeCooldown=0,BarrageCooldown=0,SnipeCooldown=0}end;if aG=="smoke"then local ap=game:GetService("Players")[aH.Name]local aX=tick()-aU[ap].SmokeCooldown;if aX<45 then az:SendAsync("You must wait "..math.floor(45-aX).." seconds before using this command again")return end;aU[ap].SmokeCooldown=tick()if ap.Character and ap.Character.PrimaryPart then local aY=ap.Character.Head;for o=1,32 do local aR=Vector3.new(math.random(-30,20),math.random(2,5),math.random(-30,20))local U,l=workspace:FindPartOnRay(Ray.new(aY.Position,aY.CFrame.LookVector*5000),ap.Character,false,true)if l then aR=l+aR else aR=aY.Position+aY.CFrame.LookVector*5000+aR end;al(aR,0.1)end;az:SendAsync("Sent smoke")end elseif aG=="barrage"or aG=="strike"then local ap=game:GetService("Players")[aH.Name]local aX=tick()-aU[ap].BarrageCooldown;if aX<45 then az:SendAsync("You must wait "..math.floor(45-aX).." seconds before using this command again")return end;local aZ=60;az:SendAsync("Barraging frags")aU[ap].BarrageCooldown=tick()for o=1,aZ do local aR=Vector3.new(math.random(-30,30),math.random(1,10),math.random(-30,30))local U,l=workspace:FindPartOnRay(Ray.new(ap.Character.PrimaryPart.Position,ap.Character.PrimaryPart.CFrame.LookVector*5000),ap.Character,false,true)if l then aR=l+aR else aR=ap.Character.PrimaryPart.Position+ap.Character.PrimaryPart.CFrame.LookVector*5000+aR end;aj(aR,math.random(1,2))end elseif aG=="snipe"then local ap=game:GetService("Players")[aH.Name]local aX=tick()-aU[ap].SnipeCooldown;if aX<60 then az:SendAsync("You must wait "..math.floor(60-aX).." seconds before using this command again")return end;local i=aI[1]if i==nil then az:SendAsync("You must specify a player to snipe")return end;i=aC(i)local a_=math.random(1,2)==1;if not a_ then az:SendAsync("Snipe failed on "..i.Name..", sorry boss.")aU[ap].SnipeCooldown=tick()return end;i=game:GetService("Players")[i.Name]if i and i.Character and i.Character.PrimaryPart then local b0=a.new(ap.Character.PrimaryPart.Position,i.Character.PrimaryPart.Position):ray_hit(i.Character.Head,i.Character.Head.Position,Vector3.zero,i.Character.Head.Material):bullet_hit(i,i.Character.Humanoid,i.Character.Head,i.Character.Head.Position,M,true):sound_id(11856245284):serialize()I:FireServer(b0)az:SendAsync("Sniped "..i.Name)aU[ap].SnipeCooldown=tick()return end;aU[ap].SnipeCooldown=tick()az:SendAsync("Failed to snipe "..i.Name..", it seems target is already dead.")end end;ax.MessageReceived:Connect(aD)ax.MessageReceived:Connect(aV)game:GetService("RunService").RenderStepped:Connect(function()for U,E in pairs(P)do av(E)end;for U,E in pairs(aw)do if not game:GetService("Players"):FindFirstChild(E.Name)then table.remove(aw,table.find(aw,E))return end;if E.Character and E.Character.PrimaryPart then af(E.Character.PrimaryPart.Position,0.05)end end;if N and O then av(game.Players.LocalPlayer)local a8=workspace.Players:FindFirstChild(O.Name)local b1=math.rad(tick()*50)local b2=5;local b3=math.cos(b1)*b2;local b4=math.sin(b1)*b2;local e=a8.PrimaryPart.Position+Vector3.new(b3,0,b4)local b5=H.Events.Spawn;b5:FireServer(e)end end)local b6=game:GetService('VirtualUser')local b7=game:GetService("VirtualUser")game:GetService("Players").LocalPlayer.Idled:connect(function()b7:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)wait(1)b7:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)end)print("hi")
+local ShootRequest; 
+do
+    ShootRequest = {};
+    ShootRequest.__index = ShootRequest;
+
+    -- origin & hrp_pos are required for all requests
+    function ShootRequest.new(origin, hrp_pos)
+        return setmetatable({
+            -- Hits on raycasted objects
+            _hits = {},
+            -- The origin of the gun shot
+            _origin = origin,
+
+            -- TODO: Figure out what this really is
+            _start_pos = origin,
+
+            -- Roblox asset id for played sound
+            _sound_id = "",
+
+            -- The position of our HumanoidRootPart
+            _hrp_pos = hrp_pos,
+            -- Hits on players themselves
+            _bullet_hits = {},
+            -- Gun data sent in the "BulletHit" part of the request
+            _bullet_hit_gun = {
+                aiming = false,
+                equipped = "Primary",
+                quick_aimed = false,
+            }
+        }, ShootRequest);
+    end
+
+    -- Adds a raycast hit to this shot request
+    function ShootRequest:ray_hit(instance, position, normal, material)
+        table.insert(self._hits, {
+            normal = normal,
+            position = position,
+            instance = instance,
+            material = (material == nil and Enum.Material.Plastic) or material
+        });
+        return self;
+    end
+
+    -- Set the sound id of the bullet
+    function ShootRequest:sound_id(id)
+        self._sound_id = "rbxassetid://{id}";
+        return self;
+    end
+
+    -- Adds a bullet hit to the request
+    function ShootRequest:bullet_hit(player, humanoid, part, pos, damage, killed)
+        table.insert(self._bullet_hits, {
+            player = player,
+            humanoid = humanoid,
+            pos = pos,
+            part = part,
+            damage = damage,
+            killed = killed
+        });
+        return self;
+    end
+
+    -- Serialize this into an actual usable shot request
+    function ShootRequest:serialize()
+        return {
+            self:_serialize_shoot(),
+            self:_serialize_bullet_hole(),
+            self:_serialize_sound(),
+            self:_serialize_bullet_hits(),
+        }
+    end
+
+    -- Serializes a hit onto an object
+    function ShootRequest:_serialize_hit(i)
+        local hit = self._hits[i];
+        return {
+            ["Normal"] = hit.normal,
+            ["Position"] = hit.position,
+            ["Instance"] = hit.instance,
+            ["Material"] = hit.material
+        }
+    end
+
+    function ShootRequest:_serialize_shoot()
+        local hits = table.create(#self._hits);
+        for i = 1, #self._hits do
+            hits[i] = self:_serialize_hit(i);
+        end
+
+        local hit_positions = table.create(#self._hits + 1);
+        hit_positions[1] = self._start_pos;
+        for i = 1, #self._hits do
+            hit_positions[i + 1] = self._hits[i].position;
+        end
+
+        return {
+            "Shoot",
+            hits,
+
+            -- FIXME: Unknown
+            {false, false},
+            -- FIXME: Unknown
+            {false, false},
+
+            hit_positions,
+
+            -- FIXME: Unknown
+            {0, 0},
+
+            self._origin,
+
+            -- FIXME: Unknown
+            {},
+            -- FIXME: Unknown
+            {},
+
+            -- FIXME: Unknown (possibly id?)
+            5
+        }
+    end
+
+    function ShootRequest:_serialize_sound()
+        return {
+            "Sound",
+            {
+                self._origin,
+                self:_serialize_hit(#self._hits)
+            },
+            self._sound_id,
+            
+            -- FIXME: Unknown
+            1,
+            -- FIXME: Unknown
+            1
+        }
+    end
+
+    function ShootRequest:_serialize_bullet_hit(i)
+        local hit = self._bullet_hits[i];
+        return {
+            ["HitPlr"] = hit.player,
+            ["HitPart"] = hit.part,
+            ["HitHuman"] = hit.humanoid,
+
+            -- LOL?
+            ["DoWhileDead"] = true,
+
+            ["Damage"] = hit.damage,
+            ["NumberCol"] = 0,
+            ["DidWallb"] = false,
+            ["DidRico"] = false,
+            ["Killed"] = false,
+
+            ["ClientHRPPos"] = self._hrp_pos,
+            ["PlayerPos"] = self._origin,
+            ["StartPos"] = self._start_pos,
+            ["HitPos"] = hit.pos,
+
+            -- NOTE: This is a guess lol
+            ["Aiming"] = {
+                self._bullet_hit_gun.aiming, 
+                false
+            },
+
+            ["Extras"] = {},
+        }
+    end
+
+    function ShootRequest:_serialize_bullet_hits()
+        local bullet_hits = table.create(#self._bullet_hits);
+        for i = 1, #self._bullet_hits do
+            bullet_hits[i] = self:_serialize_bullet_hit(i);
+        end
+
+        return {
+            "BulletHit",
+            bullet_hits,
+            {
+                ["Pos"] = self._origin,
+                ["QuickAimed"] = self._bullet_hit_gun.quick_aimed,
+                ["Equipped"] = self._bullet_hit_gun.equipped,
+                ["Aiming"] = self._bullet_hit_gun.aiming
+            }
+        }
+    end
+
+    function ShootRequest:_serialize_bullet_hole()
+        local hits = table.create(#self._hits);
+        for i = 1, #self._hits do
+            hits[i] = self:_serialize_hit(i);
+        end
+
+        return {
+            "BulletHole",
+            hits,
+            -- TODO: Calculate normal (I'm lazy)
+            Vector3.zero
+        }
+    end
+end
+
+-- Formats/pretty-prints the given table
+-- TODO: Handle table keys & metatables
+local fmt_table;
+do
+    -- Creates a stack frame for the fmt_table stack
+    local function create_frame(tbl)
+        return {
+            tbl,
+            nil
+        }
+    end
+
+    -- NOTE: Do not use this outside of fmt_table, it is exclusively for formatting keys & values
+    local function fmts_insert_value(fmts, value)
+        if typeof(value) == "table" then
+            table.insert(fmts, "{}");
+        elseif typeof(value) == "string" then
+            table.insert(fmts, "\"");
+            table.insert(fmts, value);
+            table.insert(fmts, "\"");
+        else
+            table.insert(fmts, tostring(value));
+        end
+    end
+    
+    fmt_table = function(original_table)
+        local fmts = {};
+
+        -- Each table entry in our stack, contains table, iterator
+        local stack = {
+            create_frame(original_table)
+        };
+
+        while true do
+            local frame = stack[#stack];
+
+            while true do
+                local progress = frame[2];
+                local k, v = next(frame[1], progress);
+
+                -- This is used in all paths so it is OK
+                local indent = string.rep("\t", #stack - 1);
+
+                -- If we're at the beginning of iteration (we have no progress), add a {
+                if progress == nil then
+                    table.insert(fmts, "{\n");
+                end
+
+                -- Assure that we actually advance our iteration
+                frame[2] = k;
+
+                -- Check if we have completed iteration over this table
+                if k == nil then
+                    -- Add a } to signify that the table is over and remove the trailing comma
+                    fmts[#fmts] = "\n" .. indent .. "}";
+
+                    -- We're done with this table, pop a value off of the stack and continue (also add a ,)
+                    if #stack > 1 then
+                        table.remove(stack, #stack);
+                        table.insert(fmts, ",\n");
+                        break;
+                    end
+
+                    -- Only item on the stack is the original table, return the format                
+                    return table.concat(fmts, "");
+                end
+
+                -- [key] = value
+                table.insert(fmts, indent .. "\t[");
+                fmts_insert_value(fmts, k);
+                table.insert(fmts, "] = ");
+
+                -- If we enter a non-empty table value, push another item to the stack and track our iter progress
+                if typeof(v) == "table" and next(v) ~= nil then
+                    table.insert(stack, create_frame(v));
+                    break;
+                end
+
+                fmts_insert_value(fmts, v);
+                table.insert(fmts, ",\n");
+            end
+        end
+    end
+end
+
+local Players = game:GetService("Players");
+local ReplicatedStorage = game:GetService("ReplicatedStorage");
+
+local Shoot = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Shoot");
+
+local camera = workspace.CurrentCamera;
+local Players_Folder = workspace:WaitForChild("Players");
+
+local smallestNumber	        = -1.7*10^308
+local highestNumber		        = -smallestNumber
+local isHovering                = false
+local hoverTarget               = nil
+
+local CurrentlyGodded = {}
+local Whitelisted = {
+    "1ncrem3ntal",
+    "thecopperage",
+    "ARaspiberryPi"
+}
+local Superusers = {}
+-- add any friends of the local player to the whitelist
+coroutine.wrap(function()
+    while task.wait(5) do
+        local friendsList = Players:GetFriendsAsync(Players.LocalPlayer.UserId)
+        
+        for page=1,4 do --4*50 = 200, you can not have more than 200 friends.
+            
+            for _,friend in pairs(friendsList:GetCurrentPage()) do --This will iterate through the page, friend is a table for one of fifty friends on the page.
+                for key,value in pairs(friend) do --This will iterate through the friend table's values. This will present the Id, AvatarUri, and Usernames of the friends.
+                    if key == "Username" then
+                        table.insert(Whitelisted, value)
+                        table.insert(Superusers, value)
+                    end
+                end
+            end
+            
+            if page ~= 4 then --If this isn't page 4, go into the if statement.
+            
+                local pass,err = pcall(function() --Set up a pcall function
+                    friendsList:AdvanceToNextPageAsync() --If we can not AdvanceToNextPage, then the pcall will error resulting in pass being false.
+                end)
+            
+                if not pass then --If pass is true, then the not will negate that making the if statement false and not perform the logic. If pass is false, then the not statement will negate that and run the if statement as true. If statements can only run on true statements.
+                    break --Break out of the 1 through 4 loop.
+                end    
+            end       
+        end
+    end      
+end)()
+
+local function isWhitelisted(plr)
+    for _, v in pairs(Whitelisted) do
+        if v == plr.Name then
+            return true;
+        end
+    end
+
+    return false;
+end
+
+local function isSuperuser(plr)
+    for _, v in pairs(Superusers) do
+        if v == plr.Name then
+            return true;
+        end
+    end
+
+    return false;
+end
+
+local Players = game:GetService("Players");
+local ReplicatedStorage = game:GetService("ReplicatedStorage");
+
+local UseEquipment = ReplicatedStorage:WaitForChild("Events"):WaitForChild("UseEquipment");
+
+local function weld_to(a, b, offset)
+    UseEquipment:FireServer(
+        "Sticky Bomb",
+        "Weld",
+        offset,
+        a,
+        b
+    )
+end
+
+local local_plr = Players.LocalPlayer;
+
+local function tpAll(part)
+    for _, player in Players:GetPlayers() do
+        local character = player.Character;
+        local humanoid = character and character:FindFirstChild("Humanoid");
+
+        local partBelowUs = workspace:FindPartOnRay(Ray.new(part.Position, Vector3.new(0, -1000, 0)), character, false, true);
+
+        if partBelowUs then
+            partBelowUs = partBelowUs;
+        else
+            partBelowUs = part;
+        end
+
+        if (humanoid ~= nil and humanoid.Health > 0) and humanoid.Parent ~= local_plr.Character then
+            local primary_part = character.PrimaryPart;
+            if primary_part then
+                weld_to(partBelowUs, primary_part, Vector3.new(0, 3, 0));
+            end
+        end
+    end
+end
+
+local exploits = {}
+exploits.throw = false
+local grenadeFolder = workspace:WaitForChild("Engine"):WaitForChild("Equipments")
+
+grenadeFolder.ChildAdded:Connect(function(child)
+    if exploits.throw then
+        local randomplayer = game.Players:GetPlayers()[math.random(1,#game.Players:GetPlayers())]
+        print(randomplayer, " We can throw this at them!")
+
+        repeat
+            randomplayer = game.Players:GetPlayers()[math.random(1,#game.Players:GetPlayers())]
+        until randomplayer ~= game.Players.LocalPlayer and randomplayer.Character and randomplayer.Character.PrimaryPart
+
+        weld_to(randomplayer.Character.PrimaryPart, child, Vector3.new(0,0,0))
+    end
+end)
+
+
+local function sendFlash(Position, time_to_explode)
+    local table = {
+        "Flashbang",
+        "Create",
+        Position,
+    }
+
+    UseEquipment:FireServer(unpack(table));
+    local flash_model = nil
+
+    repeat 
+        for _, v in pairs(workspace.Engine.Equipments:GetChildren()) do
+            if v.Name == "Flashbang" and v:GetAttribute("Player") == local_plr.Name then
+                flash_model = v
+            end
+        end
+        task.wait()
+    until flash_model ~= nil
+
+    local table = {
+        "Flashbang",
+        "Explode",
+        flash_model,
+        {
+            ["PlayerPos"] = Position,
+        }
+    }
+
+    task.delay(time_to_explode, function()
+        UseEquipment:FireServer(unpack(table));
+    end)
+end
+
+local function frag(Position, time_to_explode)
+    local table = {
+        "Frag Grenade",
+        "Create",
+        Position,
+    }
+
+    UseEquipment:FireServer(unpack(table));
+    local frag_model = nil
+
+    repeat 
+        for _, v in pairs(workspace.Engine.Equipments:GetChildren()) do
+            if v:GetAttribute("Player") == local_plr.Name then
+                frag_model = v
+            end
+        end
+        task.wait()
+    until frag_model ~= nil
+
+    local table = {
+        "Frag Grenade",
+        "Explode",
+        frag_model,
+        {
+            ["PlayerPos"] = Position,
+        }
+    }
+
+    task.delay(time_to_explode, function()
+        UseEquipment:FireServer(unpack(table));
+    end)
+end
+
+local function smoke(Position, time_to_explode)
+    local table = {
+        "Smoke Grenade",
+        "Create",
+        Position,
+    }
+
+    UseEquipment:FireServer(unpack(table));
+    local smoke_model = nil
+
+    repeat 
+        for _, v in pairs(workspace.Engine.Equipments:GetChildren()) do
+            if v:GetAttribute("Player") == local_plr.Name then
+                smoke_model = v
+            end
+        end
+        task.wait()
+    until smoke_model ~= nil
+
+    local table = {
+        "Smoke Grenade",
+        "Explode",
+        smoke_model,
+        {
+            ["PlayerPos"] = Position,
+        }
+    }
+
+    task.delay(time_to_explode, function()
+        UseEquipment:FireServer(unpack(table));
+    end)
+end
+
+local function destroyPart(part)
+    local table = {
+        "Flashbang",
+        "Create",
+        Vector3.new()
+    }
+
+    UseEquipment:FireServer(unpack(table));
+
+    local table = {
+        "Flashbang",
+        "Explode",
+        part,
+        {
+            ["PlayerPos"] = Vector3.new()
+        }
+    }
+
+    UseEquipment:FireServer(unpack(table));
+end
+
+local function destroymap(caller)
+    for _, v in pairs(workspace.Map:GetDescendants()) do
+        if v:IsA("BasePart") or v:IsA("Part") then
+            local prim_part = caller.Character.PrimaryPart;
+            weld_to(prim_part, v, Vector3.new(0, 0, 0));
+        end
+    end
+end
+
+local function killAll(respectWhitelist)
+    for _, v in pairs(Players:GetPlayers()) do
+        local chr = Players_Folder:FindFirstChild(v.Name);
+
+        if chr and chr:FindFirstChild("Humanoid") and chr:FindFirstChild("HumanoidRootPart") and (not respectWhitelist or not isWhitelisted(v)) then
+            local req = ShootRequest.new(Vector3.new(), chr.HumanoidRootPart.Position)
+                :ray_hit(chr.Head, chr.Head.Position, Vector3.zero, chr.Head.Material)
+                :bullet_hit(v, chr.Humanoid, chr.Head, chr.Head.Position, highestNumber, true)
+                :sound_id(11856245284)
+                :serialize();
+
+            Shoot:FireServer(req);
+        end
+    end
+end
+
+local function godPlayer(plr)
+    local chr = Players_Folder:FindFirstChild(plr.Name);
+
+    if chr and chr:FindFirstChild("Humanoid") and chr:FindFirstChild("HumanoidRootPart") then
+        local req = ShootRequest.new(Vector3.new(), Vector3.new())
+            :ray_hit(chr.Head, Vector3.new(), Vector3.zero, chr.Head.Material)
+            :bullet_hit(plr, chr.Humanoid, chr.Head, chr.Head.Position, -3000, true)
+            :sound_id(11856245284)
+            :serialize();
+
+        Shoot:FireServer(req);
+    end
+end
+
+
+local plr = Players.LocalPlayer;
+local currentlyFlashing = {};
+
+
+
+local textchatservice = game:GetService("TextChatService")
+local channels = textchatservice:WaitForChild("TextChannels")
+local channel = channels.RBXGeneral
+local lastMessage = 0
+
+local messages = {
+    ["killall"] = {
+        "Yes ma'am, owning the lobby ;3",
+        "I'm on it!",
+        "I'll get right on it!",
+        "Executing order 66",
+        "Yes ma'am, killing all players",
+        "erm.. little problem boss.. just kidding! Everyone is dead! :3",
+        "o-ok >-<",
+        "This is Bravo Six, confirming multiple casualties, over.",
+        "AIRSTIKE INCOMING!!",
+        "RUN FOR YOUR LIVES!",
+        "It appears we have multiple dead targets on the field, over.",
+        "AC-130 INBOUND!",
+        "Chopper gunner standing by.",
+    },
+    ["rain"] = {
+        "TAKE COVER! CLUSTER STRIKE INBOUND!",
+        "Copy that, frags inbound.",
+        "Frags inbound, get to cover!",
+        "Frags inbound, take cover!",
+    }
+}
+
+local function closestName(string)
+    for _, v in pairs(Players:GetPlayers()) do
+        if string.find(v.Name:lower(), string:lower()) or string.find(v.DisplayName:lower(), string:lower()) then
+            return v
+        end
+    end
+
+    return string;
+end
+
+local function onMessagePosted(message)
+    local text = message
+    local content = text.Text
+    local user = text.TextSource
+
+    if user == plr then
+        return;
+    end
+
+    if isWhitelisted(user) then
+        local content = content:lower();
+        content = content:gsub(" ", "");
+
+        local args = content:split(":");
+        content = args[1];
+
+        table.remove(args, 1);
+
+        -- example god
+        -- god:1ncrem3ntal
+
+        print(content);
+        print(args[1]);
+
+        if content == "killall" then
+            local respectWhitelist = args[1];
+
+            if respectWhitelist == nil then
+                respectWhitelist = false;
+            else
+                respectWhitelist = respectWhitelist:lower() == "true";
+            end
+
+            killAll(respectWhitelist);
+            channel:SendAsync(messages["killall"][math.random(1, #messages["killall"])]);
+        elseif content == "god" then
+            local playerToGod = args[1];
+
+            if playerToGod == "clear" then
+                CurrentlyGodded = {};
+                channel:SendAsync("Cleared godded players");
+                return;
+            end
+
+            if playerToGod == "all" then
+                for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                    if not table.find(CurrentlyGodded, v) and not isWhitelisted(v) then
+                        table.insert(CurrentlyGodded, v);
+                    end
+                end
+
+                channel:SendAsync("Godded all players");
+                return;
+            end
+            
+            if playerToGod == nil and not table.find(CurrentlyGodded, user) then
+                user = game:GetService("Players")[user.Name];
+                table.insert(CurrentlyGodded, user);
+                channel:SendAsync("Godded " .. user.Name);
+                return;
+            end
+
+            playerToGod = closestName(playerToGod);
+
+            playerToGod = game:GetService("Players")[playerToGod.Name];
+
+            if not playerToGod then
+                channel:SendAsync("Player not found");
+                return;
+            end
+
+            if table.find(CurrentlyGodded, playerToGod) then
+                channel:SendAsync("Player is already godded");
+                return;
+            end
+
+            table.insert(CurrentlyGodded, playerToGod);
+            channel:SendAsync("Godded " .. playerToGod.Name);
+        elseif content == "ungod" then
+            for i, v in pairs(CurrentlyGodded) do
+                if v and v.Character and v.Character.PrimaryPart then
+                    table.remove(CurrentlyGodded, i);
+                    local req = ShootRequest.new(Vector3.new(), v.Character.PrimaryPart.Position)
+                        :ray_hit(v.Character.Head, v.Character.Head.Position, Vector3.zero, v.Character.Head.Material)
+                        :bullet_hit(v, v.Character.Humanoid, v.Character.Head, v.Character.Head.Position, highestNumber, true)
+                        :sound_id(11856245284)
+                        :serialize();
+
+                    Shoot:FireServer(req);
+
+                    channel:SendAsync("Ungodded " .. v.Name);
+                elseif v and not v.Character then
+                    table.remove(CurrentlyGodded, i);
+                    channel:SendAsync("Ungodded " .. v.Name .. ", but failed to kill them")
+                end
+            end
+
+            CurrentlyGodded = {};
+        elseif content == "kill" then
+            -- kills a single player
+            local playerToKill = args[1];
+
+            if playerToKill == nil then
+                channel:SendAsync("You must specify a player to kill");
+                return;
+            end
+
+            
+            playerToKill = closestName(playerToKill);
+
+            if not playerToKill then
+                channel:SendAsync("Player not found");
+                return;
+            end
+
+            if playerToKill.Character and playerToKill.Character:FindFirstChild("Humanoid") and playerToKill.Character:FindFirstChild("HumanoidRootPart") then
+                local destroyThem = ShootRequest.new(camera.CFrame.Position, playerToKill.Character.HumanoidRootPart.Position)
+                    :ray_hit(playerToKill.Character.Head, playerToKill.Character.Head.Position, Vector3.zero, playerToKill.Character.Head.Material)
+                    :bullet_hit(playerToKill, playerToKill.Character.Humanoid, playerToKill.Character.Head, playerToKill.Character.Head.Position, highestNumber, true)
+                    :sound_id(11856245284)
+                    :serialize();
+
+                Shoot:FireServer(destroyThem);
+
+                channel:SendAsync("Killed " .. playerToKill.Name);
+            end
+        elseif content == "whitelist" then
+            if not isSuperuser(user) then
+                channel:SendAsync("You do not have permission to whitelist");
+                return;
+            end
+
+            local playerToWhitelist = args[1];
+
+            if playerToWhitelist == nil then
+                channel:SendAsync("You must specify a player to whitelist");
+                return;
+            end
+
+            playerToWhitelist = closestName(playerToWhitelist);
+
+            if not playerToWhitelist then
+                channel:SendAsync("Player not found");
+                return;
+            end
+
+            for _, v in pairs(Whitelisted) do
+                if v == playerToWhitelist.Name then
+                    channel:SendAsync("Player is already whitelisted");
+                    return;
+                end
+            end
+
+            table.insert(Whitelisted, playerToWhitelist.Name);
+            channel:SendAsync("Whitelisted " .. playerToWhitelist.Name);
+        elseif content == "unwhitelist" then
+            if not isSuperuser(user) then
+                channel:SendAsync("You do not have permission to unwhitelist");
+                return;
+            end
+
+            local playerToUnwhitelist = args[1];
+
+            if playerToUnwhitelist == nil then
+                channel:SendAsync("You must specify a player to unwhitelist");
+                return;
+            end
+
+            playerToUnwhitelist = closestName(playerToUnwhitelist);
+
+            if not playerToUnwhitelist then
+                channel:SendAsync("Player not found");
+                return;
+            end
+
+            for i, v in pairs(Whitelisted) do
+                if v == playerToUnwhitelist.Name then
+                    table.remove(Whitelisted, i);
+                    channel:SendAsync("Unwhitelisted " .. playerToUnwhitelist.Name);
+                    return;
+                end
+            end
+
+            channel:SendAsync("Player is not whitelisted");
+        elseif content == "tpall" then
+            local person = game:GetService("Players")[user.Name]
+            tpAll(person.Character.PrimaryPart);
+            channel:SendAsync("Teleported all players to you, " .. user.Name);
+        elseif content == "destroymap" then
+            for _, v in workspace.Map:GetDescendants() do
+                if v:IsA("BasePart") then
+                    UseEquipment:FireServer("Flashbang", "Explode", v, {PlayerPos = Vector3.zero});
+                end
+            end
+
+            channel:SendAsync("Destroyed the map");
+        elseif content == "flash" then
+            local person = game:GetService("Players")[user.Name]
+            sendFlash(person.Character.PrimaryPart.Position, 0.1);
+            channel:SendAsync("Sent flashbang");
+        elseif content == "loopflash" then
+            local playerToFlash = args[1];
+
+            if playerToFlash == "clear" then
+                currentlyFlashing = {};
+                channel:SendAsync("Cleared looping flashbangs");
+                return;
+            end
+
+            if playerToFlash == nil then
+                channel:SendAsync("You must specify a player to loop flashbangs on");
+                return;
+            end
+
+            if playerToFlash == "all" then
+                for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                    if not table.find(currentlyFlashing, v) and not isWhitelisted(v) then
+                        table.insert(currentlyFlashing, v);
+                    end
+                end
+
+                channel:SendAsync("Looping flashbangs on all players");
+                return;
+            end
+            
+            playerToFlash = closestName(playerToFlash);
+
+            playerToFlash = game:GetService("Players")[playerToFlash.Name];
+
+            if not table.find(currentlyFlashing, playerToFlash) then
+                table.insert(currentlyFlashing, playerToFlash);
+                channel:SendAsync("Looping flashbangs");
+            else
+                table.remove(currentlyFlashing, table.find(currentlyFlashing, playerToFlash));
+                channel:SendAsync("Stopped looping flashbangs");
+            end 
+        elseif content == "crash" then
+            for i,v in pairs(ReplicatedStorage:GetDescendants()) do
+                if v:IsA("Part") or v:IsA("BasePart") then
+                    destroyPart(v)
+                end
+            end
+        elseif content == "togglethrow" then
+            exploits.throw = not exploits.throw
+            channel:SendAsync("Toggled throw to " .. tostring(exploits.throw))
+        elseif content == "rain" then
+            local caller = game:GetService("Players")[user.Name]
+
+            local fragsPerSecond = 400
+
+            -- for every 5 studs in a 200 stud radius around the player, spawn a frag grenade
+            channel:SendAsync(messages["rain"][math.random(1, #messages["rain"])]);
+            for i = 1, fragsPerSecond do
+                local randomPosition = Vector3.new(math.random(-200, 200), 50, math.random(-200, 200))
+                local randomPosition = caller.Character.PrimaryPart.Position + randomPosition
+
+                frag(randomPosition, math.random(1,7))
+            end
+
+        elseif content == "fogofwar" then
+            local caller = game:GetService("Players")[user.Name]
+
+            for i,v in pairs(workspace.Players:GetChildren()) do
+                local primary_part = v.PrimaryPart
+
+                if primary_part then
+                    smoke(primary_part.Position, 0.1)
+                end
+            end
+        elseif content == "spawn" then
+            local caller = game:GetService("Players")[user.Name]
+            local character = workspace.Players:FindFirstChild(caller.Name)
+
+            if character and character.PrimaryPart then
+                local spawn = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Spawn")
+
+                spawn:FireServer(character.PrimaryPart.Position)
+
+                channel:SendAsync("Spawned at your location")
+            else
+                channel:SendAsync("Failed to spawn, please try again")
+            end
+        elseif content == "hover" then
+            isHovering = not isHovering
+
+            local player = game:GetService("Players")[user.Name]
+
+            if isHovering then
+                hoverTarget = player
+            else
+                hoverTarget = nil
+            end
+        end
+    end
+end
+
+local nWhitelist = {}
+nWhitelist.SmokeCooldown = 45
+nWhitelist.BarrageCooldown = 45
+nWhitelist.SnipeCooldown = 60
+
+local nWhitelistCooldowns = {} -- stores data about each player's cooldowns
+-- non-whitelist commands
+local function onNonWhiteListMessagePosted(message)
+    local text = message
+    local content = text.Text
+    local user = text.TextSource
+
+    if user == plr then
+        return;
+    end
+
+    local content = content:lower();
+    content = content:gsub(" ", "");
+
+    local args = content:split(":");
+    content = args[1];
+
+    table.remove(args, 1);
+
+    local c = game:GetService("Players")[user.Name]
+
+    if not table.find(nWhitelistCooldowns, c) then
+        nWhitelistCooldowns[c] = {
+            SmokeCooldown = tick(),
+            BarrageCooldown = tick(),
+            SnipeCooldown = tick()
+        }
+    end
+
+    if content == "smoke" then
+        -- send 8 smokes around the area where the caller's head's lookvector is pointing
+        local caller = game:GetService("Players")[user.Name]
+
+        local timeSince = tick() - nWhitelistCooldowns[caller].SmokeCooldown
+
+        if timeSince < 45 then
+            channel:SendAsync("You must wait " .. math.floor(45 - timeSince) .. " seconds before using this command again")
+            return
+        end
+
+        
+
+        nWhitelistCooldowns[caller].SmokeCooldown = tick()
+
+        if caller.Character and caller.Character.PrimaryPart then
+            local head = caller.Character.Head
+
+            for i = 1, 32 do
+                local randomPosition = Vector3.new(math.random(-30, 20), math.random(2, 5), math.random(-30, 20))
+                local _, pos = workspace:FindPartOnRay(Ray.new(head.Position, head.CFrame.LookVector * 5000), caller.Character, false, true)
+
+                if pos then
+                    randomPosition = pos + randomPosition
+                else
+                    randomPosition = head.Position + (head.CFrame.LookVector * 5000) + randomPosition
+                end
+
+                smoke(randomPosition, 0.1)
+            end
+
+            channel:SendAsync("Sent smoke")
+        end
+    elseif content == "barrage" or content == "strike" then
+        local caller = game:GetService("Players")[user.Name]
+
+        local timeSince = tick() - nWhitelistCooldowns[caller].BarrageCooldown
+
+        if timeSince < 45 then
+            channel:SendAsync("You must wait " .. math.floor(45 - timeSince) .. " seconds before using this command again")
+            return
+        end
+
+        local fragsToSend = 60
+        channel:SendAsync("Barraging frags")
+        nWhitelistCooldowns[caller].BarrageCooldown = tick()
+
+        for i = 1, fragsToSend do
+            local randomPosition = Vector3.new(math.random(-30, 30), math.random(1, 10), math.random(-30, 30))
+            
+            local _, pos = workspace:FindPartOnRay(Ray.new(caller.Character.PrimaryPart.Position, caller.Character.PrimaryPart.CFrame.LookVector * 5000), caller.Character, false, true)
+
+            if pos then
+                randomPosition = pos + randomPosition
+            else
+                randomPosition = caller.Character.PrimaryPart.Position + (caller.Character.PrimaryPart.CFrame.LookVector * 5000) + randomPosition
+            end
+
+            frag(randomPosition, math.random(1,2))
+        end 
+    elseif content == "snipe" then
+        local caller = game:GetService("Players")[user.Name]
+
+        local timeSince = tick() - nWhitelistCooldowns[caller].SnipeCooldown
+
+        if timeSince < 60 then
+            channel:SendAsync("You must wait " .. math.floor(60 - timeSince) .. " seconds before using this command again")
+            return
+        end
+
+        local player = args[1]
+
+        if player == nil then
+            channel:SendAsync("You must specify a player to snipe");
+            return;
+        end
+
+        player = closestName(player);
+
+        local sniped = math.random(1, 2) == 1
+
+        if not sniped then
+            channel:SendAsync("Snipe failed on " .. player.Name .. ", sorry boss.");
+            nWhitelistCooldowns[caller].SnipeCooldown = tick()
+            return;
+        end
+
+        player = game:GetService("Players")[player.Name];
+
+        if player and player.Character and player.Character.PrimaryPart then
+            local shootRequest = ShootRequest.new(caller.Character.PrimaryPart.Position, player.Character.PrimaryPart.Position)
+                :ray_hit(player.Character.Head, player.Character.Head.Position, Vector3.zero, player.Character.Head.Material)
+                :bullet_hit(player, player.Character.Humanoid, player.Character.Head, player.Character.Head.Position, highestNumber, true)
+                :sound_id(11856245284)
+                :serialize();
+
+            Shoot:FireServer(shootRequest);
+            channel:SendAsync("Sniped " .. player.Name);
+
+            nWhitelistCooldowns[caller].SnipeCooldown = tick()
+            return;
+        end
+
+        nWhitelistCooldowns[caller].SnipeCooldown = tick()
+        channel:SendAsync("Failed to snipe " .. player.Name .. ", it seems target is already dead.");
+    end
+end
+
+
+textchatservice.MessageReceived:Connect(onMessagePosted)
+textchatservice.MessageReceived:Connect(onNonWhiteListMessagePosted)
+
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    for _, v in pairs(CurrentlyGodded) do
+        godPlayer(v);
+    end
+
+    for _, v in pairs(currentlyFlashing) do
+        if not game:GetService("Players"):FindFirstChild(v.Name) then
+            table.remove(currentlyFlashing, table.find(currentlyFlashing, v));
+            return;
+        end
+
+        if v.Character and v.Character.PrimaryPart then
+            sendFlash(v.Character.PrimaryPart.Position, 0.05);
+        end
+    end
+
+    if isHovering and hoverTarget then
+        godPlayer(game.Players.LocalPlayer)
+        local character = workspace.Players:FindFirstChild(hoverTarget.Name)
+
+        local angle = math.rad(tick() * 50)
+        local radius = 5
+
+        local x = math.cos(angle) * radius
+
+        local z = math.sin(angle) * radius
+
+        local position = character.PrimaryPart.Position + Vector3.new(x, 0, z)
+
+        local Spawn = ReplicatedStorage.Events.Spawn
+
+        Spawn:FireServer(position)
+    end
+end);
+
+local VirtualUser = game:GetService('VirtualUser')
+
+local vu = game:GetService("VirtualUser")
+
+game:GetService("Players").LocalPlayer.Idled:connect(function()
+    vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    wait(1)
+    vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+end)
+
+print("hi");
